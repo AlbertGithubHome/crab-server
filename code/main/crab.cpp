@@ -13,8 +13,12 @@ public:
 
     int run()
     {
-        cout << "this is thread" << endl;
-        m.yeild(1);
+        while (true)
+        {
+            cout << "this is thread" << endl;
+            m.yield(1000);
+        }
+        return 0;
     }
 
 private:
@@ -28,7 +32,7 @@ int main(int argc, char **argv)
     a a1;
     a1.start();
 
-    cout << "test ok" << endl;
+    cout << "test ok\n";
     getchar();
     return 0;
 }

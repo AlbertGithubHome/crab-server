@@ -1,10 +1,11 @@
-#pragma once
 #include "pthread_wrapper.h"
+#include <sys/time.h>
 
 static void* thread_func(void* pParameter)
 {
     z_thread *thread = (z_thread *)pParameter;
-    return thread->execute();
+    thread->execute();
+    return NULL;
 }
 
 z_thread::z_thread()
@@ -27,7 +28,6 @@ bool z_thread::stop()
         pthread_cancel(m_thread_id);
         return !(m_running = false);
     }
-
     return false;
 }
 
