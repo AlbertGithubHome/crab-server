@@ -1,12 +1,10 @@
-#pragma once
+#ifndef __THREAD_WRAPPER_H__
+#define __THREAD_WRAPPER_H__
 
-#ifndef CPlusPlus11
-#include "pthread_wrapper.h"
-#else
 
 class thread_wrapper
 {
 
 };
 
-#endif
+#endif //__THREAD_WRAPPER_H__

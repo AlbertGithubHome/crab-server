@@ -22,7 +22,7 @@ public:
     }
 
 private:
-    thread_wrapper<pthread_wrapper_test> thread_obj;
+    pthread_wrapper<pthread_wrapper_test> thread_obj;
 };
 
 #endif
