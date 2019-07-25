@@ -25,7 +25,7 @@ public:
 private:
     bool is_valid_level(const e_log_level lv);
 
-    void write2file(const e_log_level lv, const char* msg);
+    void write2file(const char* msg);
     void write2console(const e_log_level lv, const char* msg);
 
 private:

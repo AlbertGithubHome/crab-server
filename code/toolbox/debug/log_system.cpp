@@ -29,6 +29,21 @@ static void get_current_time_str(char *time_str)
         cur_time_struct->tm_sec);
 }
 
+static void get_log_file_name(char *file_name)
+{
+    if (file_name == NULL)
+        return;
+
+    time_t	current_time;
+    time(&current_time);
+    tm* cur_time_struct = localtime(&current_time);
+
+    sprintf(file_name, "log%d-%02d-%02d.txt",
+        cur_time_struct->tm_year + 1900,
+        cur_time_struct->tm_mon + 1,
+        cur_time_struct->tm_mday);
+}
+
 static const char* get_log_lv_str(const e_log_level lv)
 {
     switch (lv)
@@ -75,7 +90,7 @@ void log_system::write_log(const e_log_level lv, const char *log_msg, ...)
     if (!m_console_toggle && !m_file_toggle)
         return;
 
-    if (!is_valid_level(lv))
+    if (!is_valid_level(lv) || lv < m_log_lv)
         return;
 
     static char msg[LOG_MSG_MAXSIZE] = { 0 };
@@ -88,12 +103,11 @@ void log_system::write_log(const e_log_level lv, const char *log_msg, ...)
     strcat(output_msg, get_log_lv_str(lv));
     strcat(output_msg, msg);
 
-    if (m_linefeed)
-        strcat(output_msg, "\r\n");
+    if (m_linefeed) strcat(output_msg, "\n");
 
     if (m_console_toggle) write2console(lv, output_msg);
 
-    if (m_file_toggle) write2file(lv, output_msg);
+    if (m_file_toggle) write2file(output_msg);
 }
 
 void log_system::output_console_toggle(const bool on)
@@ -121,16 +135,31 @@ bool log_system::is_valid_level(const e_log_level lv)
     return lv >= log_lv_infos && lv < log_lv_top;
 }
 
-void log_system::write2file(const e_log_level lv, const char* msg)
+void log_system::write2file(const char* msg)
 {
+    static char file_name[LOG_FILE_MAX_PATH] = { 0 };
+    static char file_path[LOG_FILE_MAX_PATH] = { 0 };
+    get_log_file_name(file_name);
+    strcpy(file_path, m_root_dir);
+    strcat(file_path, "/");
+    strcat(file_path, file_name);
 
+#ifdef WIN32
+    CreateDirectory(m_root_dir, NULL);
+#else
+    mkdir(m_root_dir, 0755);
+#endif
+
+    FILE * fp_file = fopen(file_path, "a+");
+    if (NULL == fp_file)
+        return;
+
+    fwrite(msg, 1, strlen(msg), fp_file);
+    fclose(fp_file);
 }
 
 void log_system::write2console(const e_log_level lv, const char* msg)
 {
-    if (m_log_lv > lv)
-        return;
-
 #ifdef WIN32
     unsigned short color = 0;
     switch (lv)
